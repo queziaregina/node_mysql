@@ -1,29 +1,51 @@
 const express = require("express")
 const exphbs = require("express-handlebars")
-const mysql = require("mysql")
+const mysql = require("mysql2")
 
 const app = express()
 
-//definindo handlebars como template engine
-app.engine("handlebars",exphbs.engine())
-app.set("view engine","handlebars")
+// Definindo Handlebars como template
+app.engine("handlebars", exphbs.engine())
+app.set("view engine", "handlebars")
 
-//pasta de arquivos estáticos com CSS, imagens
+// pasta de arquivos estáticos como CSS, imagens
 app.use(express.static("public"))
 
-//trabalhar com dados no formato json
+// Trabalhar com dados no formato json
 app.use(express.urlencoded({
     extended: true
 }))
 
-app.use(express.json())
+app.use(express.json)
 
-//rotas
-app.get("/",(requisicao,resposta) =>{
-    resposta.render("home")
+// Rotas
+app.get("/", (request, response) => {
+    response.render("home")
 })
 
-//conexão com mySQL
+app.get("/register", (request, response) => {
+    response.render("register")
+})
+
+app.post("/register/save", (request, response) => {
+    const { title, pageqty } = request.body // Desestruturação
+
+    const query = `
+    INSERT INTO books (title, pageqty)
+    VALUES ('${title}', '${pageqty}')
+    `
+
+    conn.query(query, (error) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+
+        response.redirect("/")
+    })
+})
+
+// Conexão com o MySQL
 const conn = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -33,7 +55,7 @@ const conn = mysql.createConnection({
 })
 
 conn.connect((error) => {
-    if(error) {
+    if (error) {
         console.log(error)
         return
     }
