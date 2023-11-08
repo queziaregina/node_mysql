@@ -4,65 +4,77 @@ const mysql = require("mysql2")
 
 const app = express()
 
-// Definindo Handlebars como template
+// definindo handlebars com template engine
 app.engine("handlebars", exphbs.engine())
 app.set("view engine", "handlebars")
 
-// pasta de arquivos estáticos como CSS, imagens
+// definindo a pasta public como estática
 app.use(express.static("public"))
 
-// Trabalhar com dados no formato json
-app.use(express.urlencoded({
-    extended: true
+// trabalhar com dados no formato json
+app.use(express.urlencoded({ 
+    extended: true 
 }))
 
-app.use(express.json)
+app.use(express.json())
 
-// Rotas
-app.get("/", (request, response) => {
-    response.render("home")
+// CRUD
+app.get("/register", (req, res) => {
+    res.render("register")
 })
 
-app.get("/register", (request, response) => {
-    response.render("register")
-})
-
-app.post("/register/save", (request, response) => {
-    const { title, pageqty } = request.body // Desestruturação
+app.post("/register/save", (req, res) => {
+    const {title, pageqty} = req.body
 
     const query = `
-    INSERT INTO books (title, pageqty)
-    VALUES ('${title}', '${pageqty}')
+        INSERT INTO books (title, pageqty) 
+        VALUES ('${title}', '${pageqty}')
     `
-
     conn.query(query, (error) => {
         if (error) {
             console.log(error)
             return
         }
 
-        response.redirect("/")
+        res.redirect("/")
     })
 })
 
-// Conexão com o MySQL
+app.get("/", (req, res) => {
+    const sql = 'SELECT * FROM books'
+
+    conn.query(sql, (error, data) => {
+        if (error) {
+          return console.log(error)
+        }
+
+        const books = data
+
+        console.log(books)
+
+        res.render("home", {books})
+    })
+})
+
+// definindo a conexão com o banco de dados
 const conn = mysql.createConnection({
     host: "localhost",
-    user: "root",
-    password: "root",
     database: "nodemysql",
-    port: 3307
+    port: 3307,
+    user: "root",
+    password: "root"
 })
 
-conn.connect((error) => {
-    if (error) {
-        console.log(error)
+conn.connect((err) => {
+    if (err) {
+        console.log(err)
         return
-    }
+    } 
 
-    console.log("Conectado ao MySQL!")
+    console.log("Conexão com o banco de dados realizada com sucesso")
 
     app.listen(3000, () => {
-        console.log("Servidor rodando na porta 3000!")
+        console.log("Servidor rodando na porta 3000")
     })
+    
 })
