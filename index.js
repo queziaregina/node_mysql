@@ -56,7 +56,7 @@ app.post("/register/save", (req, res) => {
     })
 })
 
-app.get("/edit/:id", (req,res) =>{
+app.get("/edit/:id", (req,res) => {
     const id = req.params.id
 
     const sql = `
