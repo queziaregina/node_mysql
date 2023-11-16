@@ -4,23 +4,39 @@ const mysql = require("mysql2")
 
 const app = express()
 
-// definindo handlebars com template engine
+// Definindo handlebars com template engine
 app.engine("handlebars", exphbs.engine())
 app.set("view engine", "handlebars")
 
-// definindo a pasta public como estática
+// Definindo a pasta public como estática
 app.use(express.static("public"))
 
-// trabalhar com dados no formato json
+// Trabalhar com dados no formato json
 app.use(express.urlencoded({ 
     extended: true 
 }))
 
+// CRUD => CREATE, READ, UPDATE, DELETE
+
 app.use(express.json())
 
-// CRUD
-app.get("/register", (req, res) => {
-    res.render("register")
+// ROTAS
+app.post("/edit/save", (req,res) => {
+    const {id, title, pageqty} = req.body
+
+    const sql = `
+        UPDATE books
+        SET title = '${title}', pageqty = '${pageqty}'
+        WHERE id = ${id}
+    `
+
+    conn.query(sql, (error) => {
+        if (error) {
+            return console.log(error)
+        }
+
+        res.redirect("/")
+    })
 })
 
 app.post("/register/save", (req, res) => {
@@ -37,6 +53,25 @@ app.post("/register/save", (req, res) => {
         }
 
         res.redirect("/")
+    })
+})
+
+app.get("/edit/:id", (req,res) =>{
+    const id = req.params.id
+
+    const sql = `
+        SELECT * FROM books
+        WHERE id=${id}
+    `
+
+    conn.query(sql, (error, data) => {
+        if (error) {
+            return console.log(error)
+        }
+
+        const book = data[0]
+
+        res.render('edit', { book })
     })
 })
 
@@ -57,6 +92,10 @@ app.get("/book/:id", (req, res) => {
 
         res.render('book', { book })
     })
+})
+
+app.get("/register", (req, res) => {
+    res.render("register")
 })
 
 app.get("/", (req, res) => {

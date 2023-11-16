@@ -5,7 +5,12 @@
     <div class="book">
         <h3>Titulo:{{this.title}}</h3>
         <p>Quantidade de páginas: {{this.pageqty}}</p>
+
+        <div class="buttons">
+            <a href="/book/{{this.id}}" class="mais">Ver mais</a>        
+            <a href="/edit/{{this.id}}" class="editar">Editar</a>        
+        </div>
+
     </div>
-    <a href="/book/{{this.id}}">Ver mais</a>
     {{/each}}
 </main>
